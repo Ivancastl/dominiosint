@@ -1,0 +1,486 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 Buscador de Dominios</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-container {
+            padding: 2rem 1rem;
+        }
+
+        .search-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: none;
+            overflow: hidden;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1.5rem;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.8rem;
+        }
+
+        .card-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-group-text {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+        }
+
+        .btn-search {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-search:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+            color: white;
+        }
+
+        .btn-search:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border-radius: 15px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+            background: #e2e8f0;
+        }
+
+        .progress-bar {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        .results-container {
+            margin-top: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 5px solid var(--primary-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .result-card:hover {
+            transform: translateX(5px);
+        }
+
+        .result-date {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .domain-item {
+            display: inline-block;
+            background: #f1f5f9;
+            color: #334155;
+            padding: 0.5rem 1rem;
+            margin: 0.3rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #cbd5e1;
+            transition: all 0.3s;
+        }
+
+        .domain-item:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+            border-color: var(--primary-color);
+        }
+
+        .stats-badge {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .alert-custom {
+            border-radius: 15px;
+            border: none;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .keyword-pill {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            margin: 0.2rem;
+            font-size: 0.9rem;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container main-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="search-card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-search fs-1 me-3"></i>
+                            <div>
+                                <h2>🔍 Buscador Inteligente de Dominios</h2>
+                                <p>Encuentra dominios relacionados con tus palabras clave en el repositorio de dominios</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Formulario de búsqueda -->
+                        <form id="searchForm">
+                            <div class="row g-4">
+                                <div class="col-12">
+                                    <label class="form-label">
+                                        <i class="bi bi-key-fill me-2"></i>Palabras clave (separadas por coma)
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-tags"></i></span>
+                                        <input type="text" class="form-control" id="palabras" 
+                                               placeholder="Ej: bitcoin, crypto, nft, blockchain" 
+                                               value="bitcoin, crypto, nft">
+                                    </div>
+                                    <div class="mt-2" id="keywordPreview"></div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-calendar-check me-2"></i>Fecha de inicio
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                        <input type="text" class="form-control datepicker" id="fecha_inicio" 
+                                               placeholder="YYYY-MM-DD" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label class="form-label">
+                                        <i class="bi bi-calendar-check me-2"></i>Fecha de fin
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                        <input type="text" class="form-control datepicker" id="fecha_fin" 
+                                               placeholder="YYYY-MM-DD" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <button type="submit" class="btn-search" id="btnBuscar">
+                                        <i class="bi bi-search me-2"></i>Buscar Dominios
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <!-- Barra de progreso -->
+                        <div class="progress-container" id="progressContainer" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-bold" id="progressStatus">Procesando...</span>
+                                <span class="badge bg-primary" id="progressPercentage">0%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div class="text-muted small mt-2" id="progressDetail"></div>
+                        </div>
+                        
+                        <!-- Resultados -->
+                        <div class="results-container" id="resultsContainer" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h4 class="mb-0">
+                                    <i class="bi bi-trophy-fill text-warning me-2"></i>
+                                    Resultados Encontrados
+                                </h4>
+                                <div>
+                                    <span class="stats-badge me-2" id="totalStats">0 fechas · 0 dominios</span>
+                                    <button class="btn-download" id="btnDescargar">
+                                        <i class="bi bi-download me-2"></i>Descargar
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="resultsList"></div>
+                        </div>
+                        
+                        <!-- Mensaje de error -->
+                        <div id="errorContainer" class="alert alert-danger alert-custom" style="display: none;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span id="errorMessage"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+    
+    <script>
+        // Inicializar calendarios
+        flatpickr(".datepicker", {
+            dateFormat: "Y-m-d",
+            locale: "es",
+            allowInput: true,
+            maxDate: "today",
+            defaultDate: new Date()
+        });
+
+        // Establecer fechas por defecto (últimos 7 días)
+        const today = new Date();
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(today.getDate() - 7);
+        
+        document.getElementById('fecha_inicio').value = sevenDaysAgo.toISOString().split('T')[0];
+        document.getElementById('fecha_fin').value = today.toISOString().split('T')[0];
+
+        // Vista previa de palabras clave
+        document.getElementById('palabras').addEventListener('input', function(e) {
+            const palabras = e.target.value.split(',').map(p => p.trim()).filter(p => p);
+            const preview = document.getElementById('keywordPreview');
+            
+            if (palabras.length > 0) {
+                preview.innerHTML = palabras.map(p => 
+                    `<span class="keyword-pill"><i class="bi bi-tag me-1"></i>${p}</span>`
+                ).join('');
+            } else {
+                preview.innerHTML = '';
+            }
+        });
+
+        // Forzar evento inicial
+        document.getElementById('palabras').dispatchEvent(new Event('input'));
+
+        // Manejar búsqueda
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btnBuscar = document.getElementById('btnBuscar');
+            const progressContainer = document.getElementById('progressContainer');
+            const resultsContainer = document.getElementById('resultsContainer');
+            const errorContainer = document.getElementById('errorContainer');
+            
+            // Obtener datos
+            const palabras = document.getElementById('palabras').value;
+            const fecha_inicio = document.getElementById('fecha_inicio').value;
+            const fecha_fin = document.getElementById('fecha_fin').value;
+            
+            // Validar
+            if (!palabras || !fecha_inicio || !fecha_fin) {
+                mostrarError('Por favor completa todos los campos');
+                return;
+            }
+            
+            // Mostrar progreso
+            btnBuscar.disabled = true;
+            btnBuscar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Buscando...';
+            progressContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            errorContainer.style.display = 'none';
+            
+            try {
+                const response = await fetch('/buscar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        palabras: palabras,
+                        fecha_inicio: fecha_inicio,
+                        fecha_fin: fecha_fin
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    mostrarError(data.error);
+                } else {
+                    mostrarResultados(data);
+                }
+            } catch (error) {
+                mostrarError('Error en la búsqueda: ' + error.message);
+            } finally {
+                btnBuscar.disabled = false;
+                btnBuscar.innerHTML = '<i class="bi bi-search me-2"></i>Buscar Dominios';
+                progressContainer.style.display = 'none';
+            }
+        });
+
+        function mostrarError(mensaje) {
+            document.getElementById('errorMessage').textContent = mensaje;
+            document.getElementById('errorContainer').style.display = 'block';
+        }
+
+        function mostrarResultados(data) {
+            const resultsList = document.getElementById('resultsList');
+            const totalStats = document.getElementById('totalStats');
+            
+            totalStats.textContent = `${data.total_fechas} fechas · ${data.total_dominios} dominios`;
+            
+            if (data.total_fechas === 0) {
+                resultsList.innerHTML = `
+                    <div class="alert alert-info alert-custom">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No se encontraron dominios con las palabras clave proporcionadas.
+                    </div>
+                `;
+            } else {
+                let html = '';
+                
+                // Ordenar fechas
+                const fechas = Object.keys(data.resultados).sort().reverse();
+                
+                fechas.forEach(fecha => {
+                    const dominios = data.resultados[fecha];
+                    html += `
+                        <div class="result-card">
+                            <div class="result-date">
+                                <i class="bi bi-calendar3 me-2"></i>${fecha}
+                                <span class="badge bg-primary float-end">${dominios.length} dominios</span>
+                            </div>
+                            <div>
+                                ${dominios.map(dominio => 
+                                    `<span class="domain-item"><i class="bi bi-globe2 me-1"></i>${dominio}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsList.innerHTML = html;
+            }
+            
+            document.getElementById('resultsContainer').style.display = 'block';
+        }
+
+        // Descargar resultados
+        document.getElementById('btnDescargar').addEventListener('click', function() {
+            window.location.href = '/descargar';
+        });
+    </script>
+</body>
+</html>
